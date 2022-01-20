@@ -3,7 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 
 //Import routes
-const authRoute = require('./routes/auth')
+const userRoute = require('./routes/user')
 
 //Database connection
 mongoose.connect("mongodb+srv://fullstacksk:fullstacksk@cluster0.6ghky.mongodb.net/TestDB?retryWrites=true&w=majority", () => {
@@ -14,7 +14,7 @@ mongoose.connect("mongodb+srv://fullstacksk:fullstacksk@cluster0.6ghky.mongodb.n
 app.use(express.json());
 
 //Apply Middleware
-app.use('/api/user', authRoute);
+app.use('/api/user', userRoute);
 
 
 
