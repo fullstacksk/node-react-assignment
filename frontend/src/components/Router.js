@@ -4,7 +4,7 @@ import { createBrowserHistory } from 'history';
 import Login from './Login';
 import Register from './Register';
 import Dashboard from './Dashboard';
-export const history = createBrowserHistory();
+export const history = createBrowserHistory({forceRefresh: true});
 
 
 const AppRouter = () => (

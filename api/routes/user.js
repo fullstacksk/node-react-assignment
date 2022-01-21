@@ -4,8 +4,32 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const verifyUser = require('./auth');
 
-// Create User
+// Register User
 router.post('/register', async (req, res) => {
+    const {name, email,role, age, mobile, password } = req.body;
+    try {
+        //Preventing user duplication
+        const userExists = await  User.findOne({email});
+        console.log("userExists :",userExists);
+        if(userExists){
+            return res.status(400).send({error:"User exists already"});
+        }
+
+        //Hashing Password
+        const hashedPassword = await bcrypt.hash(password, 8);
+
+        const user = new User({ name, email,role, age, mobile, password:hashedPassword });
+    
+        const savedUser = await user.save();
+        res.send({...savedUser._doc,password:undefined});
+    } catch (err) {
+        console.log("Error : ",err)
+        res.status(400).send({error:err.message});
+    }
+})
+
+// Create User
+router.post('/',verifyUser, async (req, res) => {
     const {name, email,role, age, mobile, password } = req.body;
     try {
         //Preventing user duplication

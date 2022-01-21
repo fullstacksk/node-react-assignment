@@ -10,12 +10,15 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from 'axios';
+;
+
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
+      <Link color="inherit" href="#">
         Your Website
       </Link>{' '}
       {new Date().getFullYear()}
@@ -27,14 +30,25 @@ function Copyright(props) {
 const theme = createTheme();
 
 const Register = ()=> {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+        const handleSubmit = async (event) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            const newUser = {
+            name: data.get('name'),
+            email:data.get('email'),
+            age: data.get('age'),
+            mobile: data.get('mobile'),
+            password:data.get('password'),
+            role:"USER"
+            };
+            try {
+                const res = await axios.post(`http://localhost:3001/api/user/register`,newUser);
+                event.target.reset();
+            } catch (err) {
+                console.log(err);
+            }
+            console.log("newUser :",newUser);
+        };
 
   return (
     <ThemeProvider theme={theme}>
@@ -49,9 +63,19 @@ const Register = ()=> {
           }}
         >
           <Typography component="h1" variant="h5">
-            Log In
+            Register
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="name"
+              label="Name"
+              name="name"
+              autoComplete="name"
+              autoFocus
+            />
             <TextField
               margin="normal"
               required
@@ -60,32 +84,69 @@ const Register = ()=> {
               label="Email Address"
               name="email"
               autoComplete="email"
-              autoFocus
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
+                <Grid container spacing={2}>
+                    <Grid item md={6}>
+                        
+                        <TextField
+                            margin="normal"
+                            required
+                            name="age"
+                            label="Age"
+                            type="number"
+                            fullWidth
+                        />
+                    </Grid>
+                    <Grid item md={6}>
+                        <TextField
+                            margin="normal"
+                            required
+                            name="mobile"
+                            label="Mobile"
+                            type="text"
+                            fullWidth
+                        />
+                    </Grid>
+                </Grid> 
+                <Grid container spacing={2}>
+                    <Grid item md={6}>
+                        <TextField
+                            margin="normal"
+                            name="password"
+                            label="Password"
+                            type="password"
+                            fullWidth
+                            autoComplete="current-password"
+                        />
+                    </Grid>
+                    <Grid item md={6}>
+                        <TextField
+                            margin="normal"
+                            name="confirmPassword"
+                            label="Confirm Password"
+                            type="password"
+                            fullWidth
+                            autoComplete="current-password"
+                        />
+                    </Grid>
+                </Grid> 
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Log In
+              Register
             </Button>
             
             <Grid container >
-              <Grid item>
-                <Link href="/login" variant="body2">
-                  {"Admin can login here"}
-                </Link>
+                <Grid item xs={6}>
+                    {" "}
+                </Grid>
+                <Grid item xs={6}>
+                    <Link href="/login" variant="body2">
+                    {"Are you an admin ? login here"}
+                    </Link>
               </Grid>
             </Grid>
           </Box>

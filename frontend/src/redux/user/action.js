@@ -32,14 +32,16 @@ export const logoutUser = ()=>{
     }
 }
 export const updateUser = (user)=>{
+    console.log("UPDATE_USER : ",user);
     return {
         type:UPDATE_USER,
         payload:user
     }
 }
 export const deleteUser = (id)=>{
+    console.log("DELETE_USER : ",id);
     return {
-        type:UPDATE_USER,
+        type:DELETE_USER,
         payload:id
     }
 }

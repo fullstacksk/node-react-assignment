@@ -47,7 +47,7 @@ export default (state=initialState, {type,payload}) =>{
         case DELETE_USER : 
             return {
                 ...state,
-                users:state.users.filter(user=> user._id !== payload)
+                users:[...state.users.filter(user=> user._id !== payload)]
             }
         case LOGOUT_USER : 
             return initialState;

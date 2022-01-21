@@ -20,7 +20,7 @@ function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
+      <Link color="inherit" href="#">
         Node Raect Demo App
       </Link>{' '}
       {new Date().getFullYear()}
@@ -35,8 +35,9 @@ const Login = ()=> {
     const handleLogin = async (data) =>{
         try {
             const res = await axios.post("http://localhost:3001/api/user/login",data);
-            console.log("data : ",res.data)
-                history.push("/dashboard");
+            console.log("data : ",res.data);
+            localStorage.setItem('accessToken',res.data.accessToken);
+            history.push("/dashboard");
             
         } catch (err) {
             console.log(err);
@@ -103,10 +104,13 @@ const Login = ()=> {
             </Button>
             
             <Grid container >
-              <Grid item>
-                <Link href="/register" variant="body2">
-                  {"User can register here"}
-                </Link>
+                <Grid item xs={6}>
+                    {" "}
+                </Grid>
+                <Grid item xs={6}>
+                    <Link href="/register" variant="body2">
+                    {"Aren't you registered? Register"}
+                    </Link>
               </Grid>
             </Grid>
           </Box>
