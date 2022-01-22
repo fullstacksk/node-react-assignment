@@ -37,12 +37,21 @@ Note : Form validation should be there with appropriate error messages.
 # first start node server
 
 > go to /api
-> npm install || yarn install
-> npm start || yarn start
-> d
 
-# start react app
+> npm install || yarn install
+
+> npm run start || yarn start
+
+# Then start react app
 
 > go to /frontend
+
 > npm install || yarn install
-> npm start || yarn start
+
+> npm run start || yarn start
+
+> Visit [`http://localhost:3000`](http://localhost:3000)
+
+# Dashboard View
+
+![Image](./node-react.png)

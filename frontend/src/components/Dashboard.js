@@ -59,7 +59,7 @@ const Dashboard = () => {
       <Container>
       {success && <SnackbarAlert type="success" message={success} />}
       {error && <SnackbarAlert type="error" message={error} />}
-        <TableContainer component={Paper} style={{marginTop:"32px",marginBottom:"16px" }}>
+        <TableContainer component={Paper} style={{marginTop:"32px",marginBottom:"16px", background:'#E7EBF0' }} >
             <div style={{padding:"16px 16px",display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                 <h3>Dashboard</h3> 
                 <div style={{display:'flex'}}>
@@ -75,15 +75,15 @@ const Dashboard = () => {
         {users.length ? <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
-            <TableRow>
-                <TableCell>Sl No</TableCell>
-                <TableCell>Avatar</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell >Email</TableCell>
-                <TableCell >Mobile</TableCell>
-                <TableCell >age</TableCell>
-                <TableCell >Role</TableCell>
-                <TableCell align="center" >Actions</TableCell>
+            <TableRow style={{background:'#E7EBF0'}}>
+                <TableCell><b>Sl No</b></TableCell>
+                <TableCell><b>Avatar</b></TableCell>
+                <TableCell><b>Name</b></TableCell>
+                <TableCell ><b>Email</b></TableCell>
+                <TableCell ><b>Mobile</b></TableCell>
+                <TableCell ><b>age</b></TableCell>
+                <TableCell ><b>Role</b></TableCell>
+                <TableCell align="center" ><b>Actions</b></TableCell>
             </TableRow>
             </TableHead>
             <TableBody>
@@ -92,7 +92,7 @@ const Dashboard = () => {
                 key={user._id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
-                <TableCell >{index+1}</TableCell>
+                <TableCell ><strong>{index+1}</strong></TableCell>
                 <TableCell >
                     <Avatar src={`http://localhost:3001/api/${user.avatar}`} variant="square" sx={{ width: 40, height: 40 }}/>
                 </TableCell>
