@@ -10,11 +10,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import EditIcon from '@mui/icons-material/Edit';
 import {useSelector, useDispatch} from 'react-redux';
 import axios from 'axios';
-import {setSelectedUser, updateUser} from '../redux/user/action';
-
-
+import { setSelectedUser, updateUser } from '../redux/user/action';
+import SnackbarAlert from './SnackbarAlert';
+import validateEditUser from '../validation/validateEditUser';
 
  const EditUser = ({user}) => {
+        const [errors, setErrors] = React.useState({});
+        const [error, setError] = React.useState();
+        const [success, setSuccess] = React.useState();
         const dispatch = useDispatch();
         const selectedUser = useSelector(state=>state.selectedUser)
         const accessToken = localStorage.getItem('accessToken');
@@ -38,18 +41,29 @@ import {setSelectedUser, updateUser} from '../redux/user/action';
             setOpen(false);
         };
 
-        const handleSubmit = async (event) => {
+     const handleSubmit = async (event) => {
+            setSuccess();
+            setError();
             event.preventDefault();
             const data = new FormData(event.currentTarget);
             const updatedUserData = {
             name: data.get('name'),
             age: data.get('age'),
             mobile: data.get('mobile'),
-            };
+         };
+         const { isError, errors } = validateEditUser(updatedUserData);
+         setErrors(errors);
+         if (isError) {
+             setError("Invalid form");
+             return;
+         }
             try {
                 const newUser = await axios.put(`http://localhost:3001/api/user/${user._id}`,updatedUserData,config);
                 dispatch(updateUser(newUser.data));
+                setSuccess("User updated successfully");
+                handleClose();
             } catch (err) {
+                setError(err.message);
                 console.log(err);
             }
             console.log("updatedUserData :",updatedUserData);
@@ -62,7 +76,9 @@ import {setSelectedUser, updateUser} from '../redux/user/action';
                 <Button variant="contained" color="primary" startIcon={<EditIcon />} onClick={handleClickOpen}>
                     Edit
                 </Button>
-            <Dialog open={open} onClose={handleClose} component="form" onSubmit={handleSubmit} >
+                {success && <SnackbarAlert type="success" message={success} />}
+                {error && <SnackbarAlert type="error" message={error} />}
+            <Dialog open={open} component="form" onSubmit={handleSubmit} >
                 <DialogTitle>Edit User</DialogTitle>
                 <DialogContent>
                 {/* <DialogContentText>
@@ -78,6 +94,8 @@ import {setSelectedUser, updateUser} from '../redux/user/action';
                     fullWidth
                     variant="standard"
                     defaultValue={selectedUser.name}
+                    error={errors.name}
+                    helperText={errors.name}
                 />
                 <TextField
                     autoFocus
@@ -102,6 +120,8 @@ import {setSelectedUser, updateUser} from '../redux/user/action';
                             fullWidth
                             variant="standard"
                             defaultValue={selectedUser.age}
+                            error={errors.age}
+                            helperText={errors.age}
                         />
                     </Grid>
                     <Grid item md={6}>
@@ -114,13 +134,15 @@ import {setSelectedUser, updateUser} from '../redux/user/action';
                             fullWidth
                             variant="standard"
                             defaultValue={selectedUser.mobile}
+                            error={errors.mobile}
+                            helperText={errors.mobile}
                         />
                     </Grid>
                 </Grid> 
                 </DialogContent>
                 <DialogActions>
                 <Button type="button" onClick={handleClose}>Cancel</Button>
-                <Button type="submit" onClick={handleClose}>Save</Button>
+                <Button type="submit">Save</Button>
                 </DialogActions>
             </Dialog>
             </div>

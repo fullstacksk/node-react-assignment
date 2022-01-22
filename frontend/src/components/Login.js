@@ -1,4 +1,4 @@
-import  React , {useEffect} from 'react';
+import  React , {useState} from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -12,7 +12,12 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import axios from 'axios';
-import {history} from './Router';
+import { history } from './Router';
+import SnackbarAlert from './SnackbarAlert';
+import validateLoginUser from '../validation/validateLoginUser';
+;
+
+
 
 
 
@@ -31,17 +36,31 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-const Login = ()=> {
-    const handleLogin = async (data) =>{
+const Login = () => {
+    const [errors, setErrors] = React.useState({});
+    const [error, setError] = useState();
+  const handleLogin = async (data) => {
+        setError();
+        const { errors, isError } = validateLoginUser(data);
+        setErrors(errors);
         try {
+            if(isError){
+              setError("Invalid form");
+              return;
+            }
             const res = await axios.post("http://localhost:3001/api/user/login",data);
             console.log("data : ",res.data);
             localStorage.setItem('accessToken',res.data.accessToken);
             history.push("/dashboard");
             
         } catch (err) {
-            console.log(err);
-        }
+              if(err.message.includes("400")){
+                setError("Invalid email/password ");
+              }
+              else
+                setError(err.message);
+              console.log(err);
+      }
     }
     // useEffect(()=>{
     // },[])
@@ -62,6 +81,7 @@ const Login = ()=> {
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
+      {error && <SnackbarAlert type="error" message={error} />}
         <Box
           sx={{
             marginTop: 8,
@@ -83,6 +103,8 @@ const Login = ()=> {
               name="email"
               autoComplete="email"
               autoFocus
+              error={errors.email}
+              helperText={errors.email}
             />
             <TextField
               margin="normal"
@@ -93,6 +115,8 @@ const Login = ()=> {
               type="password"
               id="password"
               autoComplete="current-password"
+              error={errors.password}
+              helperText={errors.password}
             />
             <Button
               type="submit"

@@ -10,6 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 import DeleteIcon from '@mui/icons-material/Delete';
+import LogoutIcon from '@mui/icons-material/ExitToApp';
 import EditUser from './EditUser';
 import AddUser from './AddUser';
 import SnackbarAlert from './SnackbarAlert';
@@ -17,7 +18,10 @@ import SnackbarAlert from './SnackbarAlert';
 
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
-import {fetchUsers, deleteUser} from '../redux/user/action';
+import { fetchUsers, deleteUser, logoutUser } from '../redux/user/action';
+import {history} from './Router';
+;
+
 
 
 
@@ -31,9 +35,8 @@ const rows = [
 ];
 
 const Dashboard = () => {
-    const [success, setSuccess] = React.useState(false);
-    const [error, setError] = React.useState(false);
-    const [message, setMessage] = React.useState("");
+    const [success, setSuccess] = React.useState();
+    const [error, setError] = React.useState();
     const accessToken = localStorage.getItem('accessToken')
     const dispatch = useDispatch()
     
@@ -55,18 +58,20 @@ const Dashboard = () => {
             console.log(err);
         }
     }
+    const handleLogout = () => {
+        localStorage.removeItem("accessToken");
+        dispatch(logoutUser());
+        history.push('/login');
+    }
     const handleDeleteUser = async (id)=>{
         try {
-            setSuccess(false);
-            setError(false);
-            throw new Error();
+            setSuccess();
+            setError();
             await axios.delete(`http://localhost:3001/api/user/${id}`,config)
             dispatch(deleteUser(id))
-            setSuccess(true);
-            setMessage("User deleted successfully");
+            setSuccess("User deleted successfully");
         } catch (error) {
-            setError(true);
-            setMessage("Something went wrong");
+            setError("Something went wrong");
             console.log(error);
         }
     }
@@ -76,15 +81,22 @@ const Dashboard = () => {
     },[])
   return (
       <Container>
-      {success && <SnackbarAlert type="success" message={message} />}
-      {error && <SnackbarAlert type="error" message={message} />}
+      {success && <SnackbarAlert type="success" message={success} />}
+      {error && <SnackbarAlert type="error" message={error} />}
         <TableContainer component={Paper} style={{marginTop:"32px",marginBottom:"16px" }}>
             <div style={{padding:"16px 16px",display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <h3>User List</h3> 
-                <AddUser /> 
+                <h3>Dashboard</h3> 
+                <div style={{display:'flex'}}>
+                      <AddUser />
+                        <Button style={{marginLeft:'32px'}} variant="contained" color="error" startIcon={<LogoutIcon />} 
+                        onClick={()=>handleLogout()} >
+                            Log Out
+                        </Button> 
+
+                </div>
             </div>
         </TableContainer >
-        <TableContainer component={Paper}>
+        {users.length ? <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
             <TableRow>
@@ -121,10 +133,11 @@ const Dashboard = () => {
                     </div>
                 </TableCell>
                 </TableRow>
-            ))}
+            ))}       
             </TableBody>
         </Table>
         </TableContainer>
+        :<div style={{display:'flex',justifyContent:'center'}}>No Data Found</div>}  
     </Container>
   );
 }

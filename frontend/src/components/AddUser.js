@@ -10,11 +10,19 @@ import DialogTitle from '@mui/material/DialogTitle';
 import UserIcon from '@mui/icons-material/GroupAdd';
 import {useSelector, useDispatch} from 'react-redux';
 import axios from 'axios';
-import {createUser} from '../redux/user/action';
+import { createUser } from '../redux/user/action';
+import validateCreateUser from '../validation/validateCreateUser';
+import SnackbarAlert from './SnackbarAlert';
+;
+
+
 
 
 
  const AddUser = () => {
+        const [errors, setErrors] = React.useState({});
+        const [error, setError] = React.useState();
+        const [success, setSuccess] = React.useState();
         const dispatch = useDispatch();
         const accessToken = localStorage.getItem('accessToken');
         const config = {
@@ -34,7 +42,8 @@ import {createUser} from '../redux/user/action';
             setOpen(false);
         };
 
-        const handleSubmit = async (event) => {
+     const handleSubmit = async (event) => {
+            setError();
             event.preventDefault();
             const data = new FormData(event.currentTarget);
             const newUser = {
@@ -43,12 +52,27 @@ import {createUser} from '../redux/user/action';
             age: data.get('age'),
             mobile: data.get('mobile'),
             password:data.get('password'),
+            confirmPassword:data.get('confirmPassword'),
             role:"USER"
             };
+            const { isError, errors } = validateCreateUser(newUser);
+            setErrors(errors);
+            if (isError) {
+                setError("Invalid form");
+                return;
+            }
             try {
                 const res = await axios.post(`http://localhost:3001/api/user`,newUser,config);
                 dispatch(createUser(res.data));
+                handleClose();
+                setSuccess("User created sussessfully");
             } catch (err) {
+              if(err.message.includes("400")){
+                setError("User already registered ");
+              setErrors(prevState => ({...prevState, email: "Email already registered"}));
+              }
+              else
+                setError(err.message);
                 console.log(err);
             }
             console.log("newUser :",newUser);
@@ -61,7 +85,9 @@ import {createUser} from '../redux/user/action';
                 <Button variant="contained" color="primary" startIcon={<UserIcon />} onClick={handleClickOpen}>
                     Add New User
                 </Button>
-            <Dialog open={open} onClose={handleClose} component="form" onSubmit={handleSubmit} >
+                {success && <SnackbarAlert type="success" message={success} />}
+                {error && <SnackbarAlert type="error" message={error} />}
+            <Dialog open={open}  disableEscapeKeyDown disableBackdropClick  component="form" noValidate onSubmit={handleSubmit} >
                 <DialogTitle>Add New User</DialogTitle>
                 <DialogContent>
                 {/* <DialogContentText>
@@ -76,69 +102,82 @@ import {createUser} from '../redux/user/action';
                     type="text"
                     fullWidth
                     variant="standard"
+                    required
+                    error={errors.name}
+                    helperText={errors.name}
                 />
                 <TextField
-                    autoFocus
                     margin="dense"
                     name="email"
                     label="Email Address"
                     type="email"
                     fullWidth
                     variant="standard"
+                    required
+                    error={errors.email}
+                    helperText={errors.email}
                 />
                 <Grid container spacing={2}>
                     <Grid item md={6}>
                         
                         <TextField
-                            autoFocus
                             margin="dense"
                             name="age"
                             label="Age"
                             type="number"
                             fullWidth
                             variant="standard"
+                            required
+                            error={errors.age}
+                            helperText={errors.age}
                         />
                     </Grid>
                     <Grid item md={6}>
                         <TextField
-                            autoFocus
                             margin="dense"
                             name="mobile"
                             label="Mobile"
                             type="text"
                             fullWidth
                             variant="standard"
+                            required
+                            error={errors.mobile}
+                            helperText={errors.mobile}
                         />
                     </Grid>
                 </Grid> 
                 <Grid container spacing={2}>
                     <Grid item md={6}>
                         <TextField
-                            autoFocus
                             margin="dense"
                             name="password"
                             label="Password"
                             type="password"
                             fullWidth
                             variant="standard"
+                            required
+                            error={errors.password}
+                            helperText={errors.password}
                         />
                     </Grid>
                     <Grid item md={6}>
                         <TextField
-                            autoFocus
                             margin="dense"
                             name="confirmPassword"
                             label="Confirm Password"
                             type="password"
                             fullWidth
                             variant="standard"
+                            required
+                            error={errors.confirmPassword}
+                            helperText={errors.confirmPassword}
                         />
                     </Grid>
                 </Grid> 
                 </DialogContent>
                 <DialogActions>
                 <Button type="button" onClick={handleClose}>Cancel</Button>
-                <Button type="submit" onClick={handleClose}>Save</Button>
+                <Button type="submit">Save</Button>
                 </DialogActions>
             </Dialog>
             </div>

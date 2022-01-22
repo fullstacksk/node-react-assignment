@@ -11,7 +11,12 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import validateCreateUser from '../validation/validateCreateUser';
+import SnackbarAlert from './SnackbarAlert';
 ;
+
+
+
 
 
 function Copyright(props) {
@@ -29,8 +34,11 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-const Register = ()=> {
-        const handleSubmit = async (event) => {
+const Register = () => {
+        const [errors, setErrors] = React.useState({});
+        const [error, setError] = React.useState();
+        const [success, setSuccess] = React.useState();
+  const handleSubmit = async (event) => {
             event.preventDefault();
             const data = new FormData(event.currentTarget);
             const newUser = {
@@ -39,13 +47,31 @@ const Register = ()=> {
             age: data.get('age'),
             mobile: data.get('mobile'),
             password:data.get('password'),
+            confirmPassword:data.get('confirmPassword'),
             role:"USER"
-            };
-            try {
+          };
+          const { isError, errors } = validateCreateUser(newUser);
+          
+            setErrors(errors);
+            console.log("isError : ",isError);
+          try {
+            setError();
+            setSuccess();
+            if (isError){
+              setError("Invaild Form")
+              return;
+            }
                 const res = await axios.post(`http://localhost:3001/api/user/register`,newUser);
                 event.target.reset();
+                setSuccess("User registered successfully");
             } catch (err) {
-                console.log(err);
+              if(err.message.includes("400")){
+                setError("User already registered ");
+              setErrors(prevState => ({...prevState, email: "Email already registered"}));
+              }
+              else
+                setError(err.message);
+              console.log(err);
             }
             console.log("newUser :",newUser);
         };
@@ -54,6 +80,8 @@ const Register = ()=> {
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
+      {success && <SnackbarAlert type="success" message={success} />}
+      {error && <SnackbarAlert type="error" message={error} />}
         <Box
           sx={{
             marginTop: 8,
@@ -65,7 +93,7 @@ const Register = ()=> {
           <Typography component="h1" variant="h5">
             Register
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} noValidate  sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -75,6 +103,8 @@ const Register = ()=> {
               name="name"
               autoComplete="name"
               autoFocus
+              error={errors.name}
+              helperText={errors.name}
             />
             <TextField
               margin="normal"
@@ -84,6 +114,8 @@ const Register = ()=> {
               label="Email Address"
               name="email"
               autoComplete="email"
+              error={errors.email}
+              helperText={errors.email}
             />
                 <Grid container spacing={2}>
                     <Grid item md={6}>
@@ -95,6 +127,8 @@ const Register = ()=> {
                             label="Age"
                             type="number"
                             fullWidth
+                            error={errors.age}
+                            helperText={errors.age}
                         />
                     </Grid>
                     <Grid item md={6}>
@@ -105,6 +139,8 @@ const Register = ()=> {
                             label="Mobile"
                             type="text"
                             fullWidth
+                            error={errors.mobile}
+                            helperText={errors.mobile}
                         />
                     </Grid>
                 </Grid> 
@@ -116,7 +152,10 @@ const Register = ()=> {
                             label="Password"
                             type="password"
                             fullWidth
+                            required
                             autoComplete="current-password"
+                            error={errors.password}
+                            helperText={errors.password}
                         />
                     </Grid>
                     <Grid item md={6}>
@@ -126,7 +165,10 @@ const Register = ()=> {
                             label="Confirm Password"
                             type="password"
                             fullWidth
+                            required
                             autoComplete="current-password"
+                            error={errors.confirmPassword}
+                            helperText={errors.confirmPassword}
                         />
                     </Grid>
                 </Grid> 
