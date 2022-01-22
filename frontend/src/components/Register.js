@@ -53,7 +53,7 @@ const Register = () => {
           const { isError, errors } = validateCreateUser(newUser);
           
             setErrors(errors);
-            console.log("isError : ",isError);
+            // console.log("isError : ",isError);
           try {
             setError();
             setSuccess();
@@ -73,7 +73,7 @@ const Register = () => {
                 setError(err.message);
               console.log(err);
             }
-            console.log("newUser :",newUser);
+            // console.log("newUser :",newUser);
         };
 
   return (

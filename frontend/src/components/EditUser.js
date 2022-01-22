@@ -27,7 +27,7 @@ import validateEditUser from '../validation/validateEditUser';
             }
         }
         
-        console.log("selectedUser : ",selectedUser)
+        // console.log("selectedUser : ",selectedUser)
 
         const [open, setOpen] = React.useState(false);
 
@@ -66,7 +66,7 @@ import validateEditUser from '../validation/validateEditUser';
                 setError(err.message);
                 console.log(err);
             }
-            console.log("updatedUserData :",updatedUserData);
+            // console.log("updatedUserData :",updatedUserData);
         };
 
         

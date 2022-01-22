@@ -1,5 +1,5 @@
 import {FETCH_USERS,ADD_USER, SELECTED_USER, UPDATE_USER, DELETE_USER,LOGIN_USER,LOGOUT_USER} from './types';
-;
+
 
 const initialState={
     loading:false,

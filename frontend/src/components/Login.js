@@ -2,8 +2,6 @@ import  React , {useState} from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -12,10 +10,14 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import axios from 'axios';
-import { history } from './Router';
 import SnackbarAlert from './SnackbarAlert';
 import validateLoginUser from '../validation/validateLoginUser';
-;
+// import validateToken from '../validation/validateToken';
+import { useDispatch } from 'react-redux';
+import {loginUser, fetchUsers} from '../redux/user/action';
+
+
+
 
 
 
@@ -37,9 +39,22 @@ function Copyright(props) {
 const theme = createTheme();
 
 const Login = () => {
+    const dispatch = useDispatch();
     const [errors, setErrors] = React.useState({});
     const [error, setError] = useState();
-  const handleLogin = async (data) => {
+    const getUsers = async (accessToken) =>{
+        try {
+            const res = await axios.get("http://localhost:3001/api/user",{
+        headers: {
+            "auth-token": accessToken
+        }
+    });
+            dispatch(fetchUsers(res.data));
+        } catch (err) {
+            console.log(err);
+        }
+    }
+    const handleLogin = async (data) => {
         setError();
         const { errors, isError } = validateLoginUser(data);
         setErrors(errors);
@@ -49,9 +64,10 @@ const Login = () => {
               return;
             }
             const res = await axios.post("http://localhost:3001/api/user/login",data);
-            console.log("data : ",res.data);
             localStorage.setItem('accessToken',res.data.accessToken);
-            history.push("/dashboard");
+            dispatch(loginUser(res.data));
+            getUsers(res.data.accessToken);
+            // console.log("data : ",res.data);
             
         } catch (err) {
               if(err.message.includes("400")){
@@ -62,8 +78,6 @@ const Login = () => {
               console.log(err);
       }
     }
-    // useEffect(()=>{
-    // },[])
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -72,7 +86,7 @@ const Login = () => {
       email: data.get('email'),
       password: data.get('password'),
     };
-    console.log("loginData :",loginData);
+    // console.log("loginData :",loginData);
     
     handleLogin(loginData);
   };

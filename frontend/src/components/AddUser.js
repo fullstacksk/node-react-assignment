@@ -75,7 +75,7 @@ import SnackbarAlert from './SnackbarAlert';
                 setError(err.message);
                 console.log(err);
             }
-            console.log("newUser :",newUser);
+            // console.log("newUser :",newUser);
         };
 
         

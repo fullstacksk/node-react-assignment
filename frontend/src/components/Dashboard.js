@@ -19,20 +19,6 @@ import SnackbarAlert from './SnackbarAlert';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchUsers, deleteUser, logoutUser } from '../redux/user/action';
-import {history} from './Router';
-;
-
-
-
-
-
-function createData(name, email, mobile, age, role) {
-  return { name, email, mobile, age, role };
-}
-
-const rows = [
-  createData('Shailendra Kumar', 'fullstacksk@gmail.ccom', '7845985645','23' ,"USER"),
-];
 
 const Dashboard = () => {
     const [success, setSuccess] = React.useState();
@@ -41,27 +27,16 @@ const Dashboard = () => {
     const dispatch = useDispatch()
     
     const users = useSelector((state) => state.users);
-    console.log("users data in dashboard page: ",users)
+    // console.log("users data in dashboard page: ",users)
     
     const config = {
         headers: {
             "auth-token": accessToken
         }
     }
-    const getUsers = async () =>{
-        console.log("fetching user")
-        try {
-            const res = await axios.get("http://localhost:3001/api/user",config);
-            console.log("fetch user res: ",res.data)
-            dispatch(fetchUsers(res.data));
-        } catch (err) {
-            console.log(err);
-        }
-    }
     const handleLogout = () => {
         localStorage.removeItem("accessToken");
         dispatch(logoutUser());
-        history.push('/login');
     }
     const handleDeleteUser = async (id)=>{
         try {
@@ -76,9 +51,9 @@ const Dashboard = () => {
         }
     }
     
-    useEffect(()=>{
-        getUsers();
-    },[])
+    // useEffect(()=>{
+    //     getUsers();
+    // },[])
   return (
       <Container>
       {success && <SnackbarAlert type="success" message={success} />}
