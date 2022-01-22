@@ -45,8 +45,8 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
         throw error;
     }
 
-    const avatar = req.file.path.replace("\\", "/");
-    
+    const avatar = req.file.path.replace(/\134/g,"/");
+    // console.log(req.file.path,avatar);
     try {
         //Preventing user duplication
         const userExists = await  User.findOne({email});
