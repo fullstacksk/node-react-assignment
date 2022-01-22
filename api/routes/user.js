@@ -3,10 +3,50 @@ const User = require('../model/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const verifyUser = require('./auth');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
+
+/* File Upload Default Settings */
+
+/* File Storage Settings */
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'assets/images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, uuidv4() + '-' + file.originalname);
+    }
+});
+
+/* File Filter Settings */
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    }
+    else {
+        cb(null, false);
+    }
+}
+
+const upload = multer({
+    storage: fileStorage,
+    limits: {
+        fileSize: 1024 * 1024 * 5
+    },
+    fileFilter: fileFilter
+});
 
 // Register User
-router.post('/register', async (req, res) => {
-    const {name, email,role, age, mobile, password } = req.body;
+router.post('/register', upload.single('avatar'), async (req, res) => {
+    const { name, email, role, age, mobile, password } = req.body;
+    if (!req.file) {
+        const error = new Error("No Image Found");
+        error.statusCode = 422;
+        throw error;
+    }
+
+    const avatar = req.file.path.replace("\\", "/");
+    
     try {
         //Preventing user duplication
         const userExists = await  User.findOne({email});
@@ -18,9 +58,10 @@ router.post('/register', async (req, res) => {
         //Hashing Password
         const hashedPassword = await bcrypt.hash(password, 8);
 
-        const user = new User({ name, email,role, age, mobile, password:hashedPassword });
+        const user = new User({ name, email,role, age, mobile, password:hashedPassword ,avatar});
     
         const savedUser = await user.save();
+        console.log("saved user : ",savedUser);
         res.send({...savedUser._doc,password:undefined});
     } catch (err) {
         console.log("Error : ",err)

@@ -2,8 +2,8 @@ import validator from 'validator';
 ;
 
 export default (data) => {
-    const { name, email, age, mobile, password, confirmPassword } = data;
-    let errors = { name: "", email: "", age: "", mobile: "", password: "", confirmPassword: "" };
+    const { name, email, age, mobile, password, confirmPassword,avatar } = data;
+    let errors = { name: "", email: "", age: "", mobile: "", password: "", confirmPassword: "",avatar:"" };
     let isError = false;
     if (!name)
         errors.name = "Name is required";
@@ -18,7 +18,9 @@ export default (data) => {
     if (password.length < 8)
         errors.password = "Minimum 8 chars";
     if (password !== confirmPassword)
-        errors.confirmPassword = "Password mismatch"
-    isError = !!errors.name || !!errors.email || !!errors.age || !!errors.mobile ||  !!errors.password || !!errors.confirmPassword;
+        errors.confirmPassword = "Password mismatch";
+    if (!avatar)
+        errors.avatar = "Avatar is required";
+    isError = !!errors.name || !!errors.email || !!errors.age || !!errors.mobile ||  !!errors.password || !!errors.confirmPassword || !!errors.avatar;
     return {isError, errors};
 }

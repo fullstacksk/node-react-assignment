@@ -38,9 +38,22 @@ const Register = () => {
         const [errors, setErrors] = React.useState({});
         const [error, setError] = React.useState();
         const [success, setSuccess] = React.useState();
-  const handleSubmit = async (event) => {
+        const [file, setFile] = React.useState();
+        const configFile = {
+            headers: {
+                    'content-type': 'multipart/form-data'
+            }
+        }
+        const handleFileChange = (e)=>{
+          setFile(e.target.files[0])
+        }
+        const handleSubmit = async (event) => {
             event.preventDefault();
+            //Object to be passed as request body
             const data = new FormData(event.currentTarget);
+            data.append('role','USER')
+            
+            //Object for validation
             const newUser = {
             name: data.get('name'),
             email:data.get('email'),
@@ -48,20 +61,26 @@ const Register = () => {
             mobile: data.get('mobile'),
             password:data.get('password'),
             confirmPassword:data.get('confirmPassword'),
+            avatar:file,
             role:"USER"
           };
+
+          // const formData = new FormData();
+          // formData.append('avatar', file);
+          
+            // console.log("newUser :",newUser);
           const { isError, errors } = validateCreateUser(newUser);
           
             setErrors(errors);
             // console.log("isError : ",isError);
           try {
-            setError();
-            setSuccess();
-            if (isError){
-              setError("Invaild Form")
-              return;
-            }
-                const res = await axios.post(`http://localhost:3001/api/user/register`,newUser);
+                setError();
+                setSuccess();
+                if (isError){
+                  setError("Invaild Form")
+                  return;
+                }
+                const res = await axios.post(`http://localhost:3001/api/user/register`,data,configFile);
                 event.target.reset();
                 setSuccess("User registered successfully");
             } catch (err) {
@@ -73,7 +92,6 @@ const Register = () => {
                 setError(err.message);
               console.log(err);
             }
-            // console.log("newUser :",newUser);
         };
 
   return (
@@ -93,7 +111,7 @@ const Register = () => {
           <Typography component="h1" variant="h5">
             Register
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate  sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} noValidate enctype='multipart/form-data'  sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -167,11 +185,23 @@ const Register = () => {
                             fullWidth
                             required
                             autoComplete="current-password"
+                            
                             error={errors.confirmPassword}
                             helperText={errors.confirmPassword}
                         />
                     </Grid>
                 </Grid> 
+            <TextField
+              margin="normal"
+              type="file"
+              fullWidth
+              id="avatar"
+              // label="Upload Image"
+              onChange={handleFileChange}
+              name="avatar"
+              error={errors.avatar}
+              helperText={errors.avatar}
+            />
             <Button
               type="submit"
               fullWidth
