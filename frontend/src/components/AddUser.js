@@ -23,10 +23,15 @@ import SnackbarAlert from './SnackbarAlert';
         const [errors, setErrors] = React.useState({});
         const [error, setError] = React.useState();
         const [success, setSuccess] = React.useState();
+        const [file, setFile] = React.useState();
+        const handleFileChange = (e)=>{
+          setFile(e.target.files[0])
+        }
         const dispatch = useDispatch();
         const accessToken = localStorage.getItem('accessToken');
         const config = {
             headers: {
+                'content-type': 'multipart/form-data',
                 "auth-token": accessToken
             }
         }
@@ -46,6 +51,7 @@ import SnackbarAlert from './SnackbarAlert';
             setError();
             event.preventDefault();
             const data = new FormData(event.currentTarget);
+            data.append('role',"USER")
             const newUser = {
             name: data.get('name'),
             email:data.get('email'),
@@ -53,6 +59,7 @@ import SnackbarAlert from './SnackbarAlert';
             mobile: data.get('mobile'),
             password:data.get('password'),
             confirmPassword:data.get('confirmPassword'),
+            avatar:file,
             role:"USER"
             };
             const { isError, errors } = validateCreateUser(newUser);
@@ -62,7 +69,7 @@ import SnackbarAlert from './SnackbarAlert';
                 return;
             }
             try {
-                const res = await axios.post(`http://localhost:3001/api/user`,newUser,config);
+                const res = await axios.post(`http://localhost:3001/api/user`,data,config);
                 dispatch(createUser(res.data));
                 handleClose();
                 setSuccess("User created sussessfully");
@@ -174,6 +181,17 @@ import SnackbarAlert from './SnackbarAlert';
                         />
                     </Grid>
                 </Grid> 
+                <TextField
+                    margin="normal"
+                    type="file"
+                    fullWidth
+                    id="avatar"
+                    // label="Upload Image"
+                    onChange={handleFileChange}
+                    name="avatar"
+                    error={errors.avatar}
+                    helperText={errors.avatar}
+                />
                 </DialogContent>
                 <DialogActions>
                 <Button type="button" onClick={handleClose}>Cancel</Button>

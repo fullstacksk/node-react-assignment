@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -18,11 +19,16 @@ import validateEditUser from '../validation/validateEditUser';
         const [errors, setErrors] = React.useState({});
         const [error, setError] = React.useState();
         const [success, setSuccess] = React.useState();
+        const [file, setFile] = React.useState();
         const dispatch = useDispatch();
         const selectedUser = useSelector(state=>state.selectedUser)
         const accessToken = localStorage.getItem('accessToken');
+        const handleFileChange = (e)=>{
+          setFile(e.target.files[0])
+        }
         const config = {
             headers: {
+                'content-type': 'multipart/form-data',
                 "auth-token": accessToken
             }
         }
@@ -50,6 +56,7 @@ import validateEditUser from '../validation/validateEditUser';
             name: data.get('name'),
             age: data.get('age'),
             mobile: data.get('mobile'),
+            avatar : selectedUser.avatar
          };
          const { isError, errors } = validateEditUser(updatedUserData);
          setErrors(errors);
@@ -58,7 +65,7 @@ import validateEditUser from '../validation/validateEditUser';
              return;
          }
             try {
-                const newUser = await axios.put(`http://localhost:3001/api/user/${user._id}`,updatedUserData,config);
+                const newUser = await axios.put(`http://localhost:3001/api/user/${user._id}`,data,config);
                 dispatch(updateUser(newUser.data));
                 setSuccess("User updated successfully");
                 handleClose();
@@ -136,6 +143,28 @@ import validateEditUser from '../validation/validateEditUser';
                             defaultValue={selectedUser.mobile}
                             error={errors.mobile}
                             helperText={errors.mobile}
+                        />
+                    </Grid>
+                </Grid> 
+                <Grid container spacing={2} style={{marginTop:"16px"}}>
+                    <Grid item md={4}>
+                        <Avatar 
+                            src={`http://localhost:3001/api/${selectedUser.avatar}`} variant="square" 
+                            sx={{ width: 100, height: 100 }}
+                        />
+
+                    </Grid>
+                    <Grid item md={8}>
+                        <TextField
+                            margin="normal"
+                            type="file"
+                            fullWidth
+                            id="avatar"
+                            // label="Upload Image"
+                            onChange={handleFileChange}
+                            name="avatar"
+                            error={errors.avatar}
+                            helperText={errors.avatar}
                         />
                     </Grid>
                 </Grid> 

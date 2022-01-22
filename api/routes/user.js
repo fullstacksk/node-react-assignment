@@ -70,8 +70,15 @@ router.post('/register', upload.single('avatar'), async (req, res) => {
 })
 
 // Create User
-router.post('/',verifyUser, async (req, res) => {
+router.post('/',verifyUser, upload.single('avatar'), async (req, res) => {
     const {name, email,role, age, mobile, password } = req.body;
+    if (!req.file) {
+        const error = new Error("No Image Found");
+        error.statusCode = 422;
+        throw error;
+    }
+
+    const avatar = req.file.path.replace(/\134/g,"/");
     try {
         //Preventing user duplication
         const userExists = await  User.findOne({email});
@@ -83,7 +90,7 @@ router.post('/',verifyUser, async (req, res) => {
         //Hashing Password
         const hashedPassword = await bcrypt.hash(password, 8);
 
-        const user = new User({ name, email,role, age, mobile, password:hashedPassword });
+        const user = new User({ name, email,role, age, mobile, password:hashedPassword,avatar });
     
         const savedUser = await user.save();
         res.send({...savedUser._doc,password:undefined});
@@ -130,13 +137,19 @@ router.get('/', verifyUser , async(req, res)=>{
 })
 
 //Update User
-router.put("/:id",verifyUser, async (req,res)=>{
+router.put("/:id",verifyUser, upload.single('avatar'), async (req,res)=>{
     // console.log(req.body,req.params.id);
-    const {name,age,mobile}=req.body;
+    const { name, age, mobile } = req.body;
+    let avatar = "";
+    if (req.file) {
+        avatar = req.file.path.replace(/\134/g, "/");
+    }
+
+    const dataToBeUpdated = !!avatar ?  {name, age, mobile, avatar}: { name, age, mobile };
     try {
         // const user = await User.findOne({_id:req.params.id});
         // console.log(user);
-        const updatedUser =await User.findByIdAndUpdate(req.params.id,{name,age,mobile},{new:true}).select("-password");
+        const updatedUser =await User.findByIdAndUpdate(req.params.id,dataToBeUpdated,{new:true}).select("-password");
         if(!updatedUser)
             return res.status(400).send({error:"User doesn't exist"});
         res.status(201).send(updatedUser);
@@ -149,6 +162,10 @@ router.put("/:id",verifyUser, async (req,res)=>{
 //Delete User
 router.delete("/:id",verifyUser,async (req,res)=>{
     try {
+        const isAdmin = await User.findOne({ _id: req.params.id, role: 'ADMIN' });
+        if (isAdmin) {
+            return res.status(404).send({error: "Insufficient previlages"})
+        }
         const user = await User.findOneAndDelete({ _id: req.params.id}).select("-password");
         if (!user) {
             return res.status(404).send({error: "User doesn't exist"})

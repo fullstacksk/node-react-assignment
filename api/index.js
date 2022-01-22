@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 
 //Import routes
 const userRoute = require('./routes/user')
@@ -21,6 +22,7 @@ app.use(function(req, res, next) {
   next();
 });
 app.use(express.json());
+app.use(`/api/assets`, express.static(path.join(__dirname, "assets")));
 
 //Apply Middleware
 app.use('/api/user', userRoute);

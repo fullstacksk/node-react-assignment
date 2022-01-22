@@ -1,6 +1,7 @@
 import React , {useEffect} from 'react';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -76,6 +77,7 @@ const Dashboard = () => {
             <TableHead>
             <TableRow>
                 <TableCell>Sl No</TableCell>
+                <TableCell>Avatar</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell >Email</TableCell>
                 <TableCell >Mobile</TableCell>
@@ -91,6 +93,9 @@ const Dashboard = () => {
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                 <TableCell >{index+1}</TableCell>
+                <TableCell >
+                    <Avatar src={`http://localhost:3001/api/${user.avatar}`} variant="square" sx={{ width: 40, height: 40 }}/>
+                </TableCell>
                 <TableCell component="th" scope="row">
                     {user.name}
                 </TableCell>
