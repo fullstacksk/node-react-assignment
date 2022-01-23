@@ -107,8 +107,14 @@ router.post('/login', async (req, res) => {
         
     // Checking User availability
     const user = await User.findOne({email})
+    
     if(!user)
         return res.status(400).send({error:"Invalid email/password"});
+        
+    //Stricting login to admin only    
+    if(user.role !== 'ADMIN')
+        return res.status(400).send({error:"Insufficient privilages"});
+        
     //Matching Password
     const isPasswordValid = await bcrypt.compare(password,user.password);
     if(!isPasswordValid)

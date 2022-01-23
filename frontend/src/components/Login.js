@@ -70,12 +70,7 @@ const Login = () => {
             // console.log("data : ",res.data);
             
         } catch (err) {
-              if(err.message.includes("400")){
-                setError("Invalid email/password ");
-              }
-              else
-                setError(err.message);
-              console.log(err);
+          setError(err?.response?.data?.error || "Something went wrong");
       }
     }
 

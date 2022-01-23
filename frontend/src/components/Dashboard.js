@@ -46,15 +46,12 @@ const Dashboard = () => {
             await axios.delete(`http://localhost:3001/api/user/${id}`,config)
             dispatch(deleteUser(id))
             setSuccess("User deleted successfully");
-        } catch (error) {
-            setError("Something went wrong");
-            console.log(error);
+        } catch (err) {
+            setError(err?.response?.data?.error || "Something went wrong");
+            console.log(err);
         }
     }
     
-    // useEffect(()=>{
-    //     getUsers();
-    // },[])
   return (
       <Container>
       {success && <SnackbarAlert type="success" message={success} />}

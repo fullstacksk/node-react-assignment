@@ -74,13 +74,10 @@ import SnackbarAlert from './SnackbarAlert';
                 handleClose();
                 setSuccess("User created sussessfully");
             } catch (err) {
-              if(err.message.includes("400")){
-                setError("User already registered ");
-              setErrors(prevState => ({...prevState, email: "Email already registered"}));
-              }
-              else
-                setError(err.message);
-                console.log(err);
+                setError(err?.response?.data?.error || "Something went wrong");
+                if(err?.response?.data?.error?.includes('exists'))
+                    setErrors(prevState => ({...prevState, email: "Email already registered"}));
+              
             }
             // console.log("newUser :",newUser);
         };

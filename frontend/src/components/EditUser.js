@@ -70,7 +70,7 @@ import validateEditUser from '../validation/validateEditUser';
                 setSuccess("User updated successfully");
                 handleClose();
             } catch (err) {
-                setError(err.message);
+                setError(err?.response?.data?.error || "Something went wrong");
                 console.log(err);
             }
             // console.log("updatedUserData :",updatedUserData);

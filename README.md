@@ -34,6 +34,12 @@ ii) Once user clicks submit button these data will be saved in the database with
 Note : Form validation should be there with appropriate error messages.
 ```
 
+# Bootstraping project
+
+> clone master branch
+
+> install all dependencies `yarn install || npm install`
+
 # first start node server
 
 > go to /api
@@ -51,6 +57,13 @@ Note : Form validation should be there with appropriate error messages.
 > npm run start || yarn start
 
 > Visit [`http://localhost:3000`](http://localhost:3000)
+
+# Admin Login Credentials
+
+```javascript
+    email : fullstacksk@gmail.com
+    password : 11111111 (Eight times one)
+```
 
 # Dashboard View
 
